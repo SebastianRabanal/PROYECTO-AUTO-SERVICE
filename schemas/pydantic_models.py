@@ -1,12 +1,15 @@
 from pydantic import BaseModel
 from typing import List
 
-class ItemTicket(BaseModel):
-    nombre_item: str
-    detalles: List[str]
-    precio: float
+# Esquema para cada producto dentro del ticket
+class ItemPedido(BaseModel):
+    nombre: str
+    cremas: List[str]
+    extras: List[str]
+    subtotal: float
 
+# Esquema principal que recibe el POST
 class PedidoCreate(BaseModel):
-    items: List[ItemTicket]
-    total: float
     metodo_pago: str
+    total: float
+    detalle_pedido: List[ItemPedido]
