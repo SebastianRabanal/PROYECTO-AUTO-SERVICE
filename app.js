@@ -123,19 +123,28 @@ btnGenerarVoucher.addEventListener('click', () => {
         detalle_pedido: ticketPedido
     };
 
-    // Simulación del envío al backend
-    console.log("Datos listos para enviar a Python:", JSON.stringify(payloadBackend, null, 2));
-    
-    alert(`¡Pago procesado con ${metodoPago.value.toUpperCase()}!\nTotal: S/ ${totalPagar.toFixed(2)}\nGenerando voucher...`);
-    
-    // Limpiar el sistema para el siguiente cliente
-    ticketPedido = [];
-    actualizarTicketDOM();
-    document.querySelector('input[name="pago"]:checked').checked = false;
-});
-
-// Limpiar el ticket de ejemplo del HTML al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    listaTicket.innerHTML = ''; 
-    montoTotalDOM.textContent = 'S/ 0.00';
-});
+    fetch('http://127.0.0.1:8000/comprar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payloadBackend)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Error en el servidor');
+        return response.json(); // FastAPI devuelve un JSON automáticamente
+    })
+    .then(data => {
+        // data.id_venta viene del return de su función en routers.py
+        alert(`${data.mensaje}\nNúmero de operación: ${data.id_venta}`);
+        
+        // Limpiar la pantalla
+        ticketPedido = [];
+        actualizarTicketDOM();
+        document.querySelector('input[name="pago"]:checked').checked = false;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Hubo un problema de conexión con el backend.');
+    });
+})
