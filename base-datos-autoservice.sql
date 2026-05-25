@@ -79,4 +79,32 @@ CREATE TABLE Seleccion_Modificadores(
 INSERT INTO Productos_Base (nombre, precio_base) VALUES 
 	('Hamburguesa Clásica', 15.00),
     ('Pizza Personal', 12.00),
-    ();
+    ('Café Pasado',6.00);
+    
+INSERT INTO Categorias_Modificador (nombre_categoria) VALUES 
+	('Cremas'), 
+	('Extras'), 
+	('Tipo de Leche');
+
+-- Insertar Opciones de Modificadores (Vinculados a su categoría)
+-- Cremas (ID 1) - Costo 0
+INSERT INTO Opciones_Modificador (id_categoria, nombre_opcion, precio_adicional) VALUES 
+	(1, 'Mayonesa', 0.00),
+	(1, 'Kétchup', 0.00),
+	(1, 'Ají de la casa', 0.00);
+    
+-- Extras (ID 2) - Con costo adicional
+INSERT INTO Opciones_Modificador (id_categoria, nombre_opcion, precio_adicional) VALUES 
+	(2, 'Porción de papas extra', 4.00),
+	(2, 'Doble queso', 2.50);
+
+-- Tipo de Leche (ID 3) - Costo 0 o adicional
+INSERT INTO Opciones_Modificador (id_categoria, nombre_opcion, precio_adicional) VALUES 
+	(3, 'Sin Leche', 0.00),
+	(3, 'Leche Entera', 0.00),
+	(3, 'Leche de Almendras', 2.00);
+
+INSERT INTO Metodos_Pago (nombre_metodo) VALUES 
+	('Yape'), 
+	('Plin'), 
+	('Efectivo');
