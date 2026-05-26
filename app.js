@@ -1,66 +1,78 @@
-// Catálogo base para los cálculos visuales en el frontend
+// 1. Catálogo con los IDs exactos de la Base de Datos
 const catalogo = {
-    'prod-hamburguesa': { nombre: 'Hamburguesa Clásica', precioBase: 15.00 },
-    'prod-pizza': { nombre: 'Pizza Personal', precioBase: 12.00 },
-    'prod-cafe': { nombre: 'Café Pasado', precioBase: 6.00 }
+    'prod-hamburguesa': { idDb: 1, nombre: 'Hamburguesa Clásica', precioBase: 15.00 },
+    'prod-pizza': { idDb: 2, nombre: 'Pizza Personal', precioBase: 12.00 },
+    'prod-cafe': { idDb: 3, nombre: 'Café Pasado', precioBase: 6.00 }
 };
 
-const preciosExtras = {
-    'papas': 4.00,
-    'queso': 2.50
-};
-
-// Estado del pedido
-let ticketPedido = [];
 let productoActualSeleccionado = null;
+let ticketPedido = [];
 let totalPagar = 0;
 
-// Referencias al DOM
-const zonaPersonalizacion = document.getElementById('zona-personalizacion');
-const listaTicket = document.getElementById('lista-ticket');
-const montoTotalDOM = document.getElementById('monto-total');
-const btnAgregarTicket = document.querySelector('.btn-agregar-ticket');
-const btnGenerarVoucher = document.getElementById('btn-generar-voucher');
-
-// 1. Lógica para seleccionar un producto y mostrar personalización
+// 2. Seleccionar producto y cargar opciones dinámicas desde FastAPI
 document.querySelectorAll('.btn-seleccionar').forEach(boton => {
     boton.addEventListener('click', (e) => {
-        // Obtener el ID del producto clickeado (el div padre)
         const tarjeta = e.target.closest('.tarjeta-producto');
         productoActualSeleccionado = catalogo[tarjeta.id];
         productoActualSeleccionado.idHtml = tarjeta.id;
 
-        // Actualizar título de la zona de personalización
-        zonaPersonalizacion.querySelector('h3').textContent = `Personaliza tu ${productoActualSeleccionado.nombre}`;
+        const zonaPersonalizacion = document.getElementById('zona-personalizacion');
+        const contenedorMods = document.getElementById('contenedor-modificadores');
         
-        // Desmarcar checkboxes anteriores
-        document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-
-        // Mostrar la zona de personalización
+        zonaPersonalizacion.querySelector('h3').textContent = `Personaliza tu ${productoActualSeleccionado.nombre}`;
+        contenedorMods.innerHTML = '<p>Cargando opciones...</p>';
         zonaPersonalizacion.classList.remove('oculto');
+
+        // Petición GET al backend
+        fetch(`http://127.0.0.1:8000/modificadores/${productoActualSeleccionado.idDb}`)
+        .then(res => res.json())
+        .then(data => {
+            contenedorMods.innerHTML = ''; // Limpiar mensaje
+            
+            // Construir checkboxes según la respuesta de MySQL
+            for (const [categoria, opciones] of Object.entries(data)) {
+                let htmlCategoria = `<b>${categoria}</b><br>`;
+                
+                opciones.forEach(opc => {
+                    const extraText = opc.precio > 0 ? `(+ S/ ${opc.precio.toFixed(2)})` : '(Gratis)';
+                    htmlCategoria += `
+                        <label style="display:block; margin-bottom:5px;">
+                            <input type="checkbox" name="modificador" value="${opc.precio}" data-nombre="${opc.nombre}"> 
+                            ${opc.nombre} ${extraText}
+                        </label>`;
+                });
+                
+                contenedorMods.innerHTML += `<div style="margin-bottom: 15px;">${htmlCategoria}</div>`;
+            }
+        })
+        .catch(error => {
+            contenedorMods.innerHTML = '<p>Error al cargar las opciones.</p>';
+            console.error('Error fetching modificadores:', error);
+        });
     });
 });
 
-// 2. Lógica para agregar el producto personalizado al ticket
-btnAgregarTicket.addEventListener('click', () => {
+// 3. Agregar el producto configurado al Ticket
+document.querySelector('.btn-agregar-ticket').addEventListener('click', () => {
     if (!productoActualSeleccionado) return;
 
     let subtotal = productoActualSeleccionado.precioBase;
     let cremasSeleccionadas = [];
     let extrasSeleccionados = [];
 
-    // Capturar cremas (Gratis)
-    document.querySelectorAll('input[name="crema"]:checked').forEach(cb => {
-        cremasSeleccionadas.push(cb.parentNode.textContent.trim());
+    // Leer los inputs generados dinámicamente
+    document.querySelectorAll('input[name="modificador"]:checked').forEach(cb => {
+        const nombreMod = cb.getAttribute('data-nombre');
+        const precioMod = parseFloat(cb.value);
+
+        if (precioMod === 0) {
+            cremasSeleccionadas.push(nombreMod);
+        } else {
+            extrasSeleccionados.push(nombreMod);
+            subtotal += precioMod;
+        }
     });
 
-    // Capturar extras (Con costo)
-    document.querySelectorAll('input[name="extra"]:checked').forEach(cb => {
-        extrasSeleccionados.push(cb.parentNode.textContent.trim());
-        subtotal += preciosExtras[cb.value];
-    });
-
-    // Crear objeto del ítem para el ticket
     const nuevoItem = {
         nombre: productoActualSeleccionado.nombre,
         cremas: cremasSeleccionadas,
@@ -71,51 +83,45 @@ btnAgregarTicket.addEventListener('click', () => {
     ticketPedido.push(nuevoItem);
     actualizarTicketDOM();
 
-    // Ocultar personalización tras agregar
-    zonaPersonalizacion.classList.add('oculto');
+    // Ocultar zona y resetear temporal
+    document.getElementById('zona-personalizacion').classList.add('oculto');
     productoActualSeleccionado = null;
 });
 
-// 3. Lógica para actualizar la vista del ticket en la derecha
+// 4. Actualizar la vista del Ticket en pantalla
 function actualizarTicketDOM() {
-    listaTicket.innerHTML = ''; // Limpiar lista
+    const contenedorTicket = document.getElementById('lista-ticket');
+    contenedorTicket.innerHTML = '';
     totalPagar = 0;
 
-    ticketPedido.forEach((item, index) => {
+    ticketPedido.forEach((item) => {
         totalPagar += item.subtotal;
-
-        const divItem = document.createElement('div');
-        divItem.className = 'item-ticket';
         
-        let htmlDetalles = '';
-        if (item.cremas.length > 0) htmlDetalles += `<p class="detalle-item">- ${item.cremas.join(', ')}</p>`;
-        if (item.extras.length > 0) htmlDetalles += `<p class="detalle-item">- ${item.extras.join(', ')}</p>`;
-
-        divItem.innerHTML = `
-            <p class="nombre-item">1x ${item.nombre}</p>
-            ${htmlDetalles}
-            <p class="precio-item">S/ ${item.subtotal.toFixed(2)}</p>
+        let detallesText = [];
+        if (item.cremas.length > 0) detallesText.push(`Cremas: ${item.cremas.join(', ')}`);
+        if (item.extras.length > 0) detallesText.push(`Extras: ${item.extras.join(', ')}`);
+        
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <b>${item.nombre}</b> - S/ ${item.subtotal.toFixed(2)}<br>
+            <small style="color:#555;">${detallesText.join(' | ')}</small>
         `;
-        listaTicket.appendChild(divItem);
+        contenedorTicket.appendChild(li);
     });
 
-    montoTotalDOM.textContent = `S/ ${totalPagar.toFixed(2)}`;
+    document.getElementById('total-pagar').textContent = `S/ ${totalPagar.toFixed(2)}`;
 }
 
-// 4. Lógica para procesar el pago y enviar al backend (Python)
-btnGenerarVoucher.addEventListener('click', () => {
+// 5. Procesar Pago y enviar POST a FastAPI
+document.getElementById('btn-pagar').addEventListener('click', () => {
     if (ticketPedido.length === 0) {
-        alert('El ticket está vacío. Selecciona un producto.');
+        alert('Agrega al menos un producto al ticket.');
         return;
     }
 
-    const metodoPago = document.querySelector('input[name="pago"]:checked');
-    if (!metodoPago) {
-        alert('Por favor, selecciona un método de pago.');
-        return;
-    }
+    const metodoPago = document.getElementById('metodo-pago');
 
-    // Estructurar el JSON que se enviará al Backend
+    // JSON alineado estrictamente con schemas/pydantic_models.py
     const payloadBackend = {
         metodo_pago: metodoPago.value,
         total: totalPagar,
@@ -129,21 +135,22 @@ btnGenerarVoucher.addEventListener('click', () => {
         },
         body: JSON.stringify(payloadBackend)
     })
-    .then(response => {
-        if (!response.ok) throw new Error('Error en el servidor');
-        return response.json(); // FastAPI devuelve un JSON automáticamente
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`Error HTTP: ${res.status}`);
+        }
+        return res.json();
     })
     .then(data => {
-        // data.id_venta viene del return de su función en routers.py
-        alert(`${data.mensaje}\nNúmero de operación: ${data.id_venta}`);
+        alert(`${data.mensaje}\nNro. de Operación: ${data.id_venta}\nTotal: S/ ${data.total.toFixed(2)}`);
         
-        // Limpiar la pantalla
+        // Limpiar el ticket después de una compra exitosa
         ticketPedido = [];
         actualizarTicketDOM();
-        document.querySelector('input[name="pago"]:checked').checked = false;
+        document.getElementById('metodo-pago').value = 'yape'; // Resetear select
     })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Hubo un problema de conexión con el backend.');
+    .catch(err => {
+        console.error('Error en la transacción:', err);
+        alert('Hubo un problema al procesar el pago. Revisa la consola.');
     });
-})
+});
