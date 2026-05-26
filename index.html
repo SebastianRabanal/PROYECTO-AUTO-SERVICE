@@ -60,18 +60,30 @@
             </div>
 
             <div id="metodos-pago">
+                <div id="metodos-pago">
                 <h3>Método de Pago</h3>
-                <select id="metodo-pago">
-                    <option value="yape">Yape</option>
-                    <option value="plin">Plin</option>
-                    <option value="efectivo">Efectivo en Caja</option>
-                </select>
+                <div class="caja-metodos">
+                    <label class="tarjeta-pago">
+                        <input type="radio" name="metodo_pago" value="yape" checked>
+                        <img src="images/logo-yape.webp" alt="Yape" class="icono-pago"> Yape
+                    </label>
+                    <label class="tarjeta-pago">
+                        <input type="radio" name="metodo_pago" value="plin">
+                        <img src="images/logo-plin.webp" alt="Plin" class="icono-pago"> Plin
+                    </label>
+                    <label class="tarjeta-pago">
+                        <input type="radio" name="metodo_pago" value="efectivo">
+                        <img src="images/logo-efectivo.webp" alt="Efectivo" class="icono-pago"> Efectivo
+                    </label>
+                </div>
+            </div>
             </div>
 
             <button id="btn-pagar" class="tu-clase-verde">Pagar y Generar Voucher</button>
         </aside>
 
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="app.js"></script>
 </body>
 </html>
