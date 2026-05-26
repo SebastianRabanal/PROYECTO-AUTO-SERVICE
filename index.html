@@ -52,27 +52,23 @@
         <aside id="seccion-ticket">
             <h2>Tu Pedido</h2>
             
-            <div id="lista-ticket">
-                <div class="item-ticket">
-                    <p class="nombre-item">1x Hamburguesa Clásica</p>
-                    <p class="detalle-item">- Mayonesa, Kétchup</p>
-                    <p class="detalle-item">- Porción de papas extra</p>
-                    <p class="precio-item">S/ 19.00</p>
-                </div>
-            </div>
+            <ul id="lista-ticket">
+            </ul>
 
             <div class="total-caja">
-                <h3>Total a Pagar: <span id="monto-total">S/ 19.00</span></h3>
+                <h3>Total a Pagar: <span id="total-pagar">S/ 0.00</span></h3>
             </div>
 
             <div id="metodos-pago">
                 <h3>Método de Pago</h3>
-                <label><input type="radio" name="pago" value="yape"> Yape</label>
-                <label><input type="radio" name="pago" value="plin"> Plin</label>
-                <label><input type="radio" name="pago" value="efectivo"> Efectivo en Caja</label>
+                <select id="metodo-pago">
+                    <option value="yape">Yape</option>
+                    <option value="plin">Plin</option>
+                    <option value="efectivo">Efectivo en Caja</option>
+                </select>
             </div>
 
-            <button id="btn-generar-voucher">Pagar y Generar Voucher</button>
+            <button id="btn-pagar" class="tu-clase-verde">Pagar y Generar Voucher</button>
         </aside>
 
     </main>
