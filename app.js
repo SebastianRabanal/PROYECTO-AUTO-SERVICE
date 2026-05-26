@@ -117,9 +117,8 @@ btnGenerarVoucher.addEventListener('click', () => {
 
     // Estructurar el JSON que se enviará al Backend
     const payloadBackend = {
-        fecha: new Date().toISOString(),
         metodo_pago: metodoPago.value,
-        total_pagado: totalPagar,
+        total: totalPagar,
         detalle_pedido: ticketPedido
     };
 
