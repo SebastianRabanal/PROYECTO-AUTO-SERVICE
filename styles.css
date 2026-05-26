@@ -183,6 +183,48 @@ body {
     background-color: #1b5e20;
 }
 
+/* Diseño de métodos de pago con imágenes */
+.caja-metodos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.tarjeta-pago {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+}
+
+.tarjeta-pago:hover {
+    border-color: var(--color-secundario);
+}
+
+/* Selector dinámico: pinta el borde naranja si está seleccionado */
+.tarjeta-pago:has(input:checked) {
+    border-color: var(--color-primario);
+    background-color: #fff8f3;
+}
+
+/* Ajuste de imagen chiquita (24x24px) */
+.icono-pago {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+/* Ocultar el círculo nativo del radio button */
+.tarjeta-pago input[type="radio"] {
+    display: none;
+}
+
 /* Ocultar elementos para lógica de JS */
 .oculto {
     display: none;
