@@ -115,11 +115,11 @@ function actualizarTicketDOM() {
 // 5. Procesar Pago y enviar POST a FastAPI
 document.getElementById('btn-pagar').addEventListener('click', () => {
     if (ticketPedido.length === 0) {
-        alert('Agrega al menos un producto al ticket.');
-        return;
+    Swal.fire({ icon: 'warning', title: 'Ticket Vacío', text: 'Agrega al menos un producto.' });
+    return;
     }
 
-    const metodoPago = document.getElementById('metodo-pago');
+    const metodoPago = document.querySelector('input[name="metodo_pago"]:checked');
 
     // JSON alineado estrictamente con schemas/pydantic_models.py
     const payloadBackend = {
@@ -142,15 +142,20 @@ document.getElementById('btn-pagar').addEventListener('click', () => {
         return res.json();
     })
     .then(data => {
-        alert(`${data.mensaje}\nNro. de Operación: ${data.id_venta}\nTotal: S/ ${data.total.toFixed(2)}`);
+        Swal.fire({
+            icon: 'success',
+            title: '¡Pago Exitoso!',
+            html: `<b>Nro. Operación:</b> ${data.id_venta}<br><b>Total:</b> S/ ${data.total.toFixed(2)}`,
+            confirmButtonColor: '#2e7d32'
+            });
         
         // Limpiar el ticket después de una compra exitosa
         ticketPedido = [];
         actualizarTicketDOM();
-        document.getElementById('metodo-pago').value = 'yape'; // Resetear select
+        document.querySelector('input[name="metodo_pago"][value="yape"]').checked = true;
     })
     .catch(err => {
         console.error('Error en la transacción:', err);
-        alert('Hubo un problema al procesar el pago. Revisa la consola.');
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Hubo un problema al procesar el pago.' });
     });
 });
