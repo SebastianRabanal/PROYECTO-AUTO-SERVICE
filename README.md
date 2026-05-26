@@ -48,3 +48,28 @@ Si deseas correr este proyecto en tu entorno local, sigue estos pasos:
 ```bash
 git clone [https://github.com/TU_USUARIO/TU_REPOSITORIO.git](https://github.com/TU_USUARIO/TU_REPOSITORIO.git)
 cd TU_REPOSITORIO
+```
+###2. Configurar Variables de Entorno (.env)
+```
+Crea un archivo .env en la raíz del proyecto para conectar la API con la base de datos en Aiven. Asegúrate de nunca subir este archivo al repositorio.
+
+Fragmento de código
+DB_HOST=kiosko-autoservice-autoservice123.c.aivencloud.com
+DB_PORT=25481
+DB_USER=avnadmin
+DB_PASSWORD=tu_password_aqui
+DB_NAME=defaultdb
+```
+###3. Instalar Dependencias del Backend
+```Bash
+pip install -r requirements.txt
+```
+###4. Ejecutar el Servidor (FastAPI)
+```Bash
+uvicorn servidor:app --reload --host 0.0.0.0 --port 10000
+La API estará disponible en http://localhost:10000
+```
+
+###5. Configurar el Frontend
+```
+Abre el archivo de JavaScript y asegúrate de que las rutas fetch apunten a tu servidor local (o a la URL de Render si estás probando la integración en la nube). Abre el archivo index.html en tu navegador para usar el Kiosko.
