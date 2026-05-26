@@ -43,3 +43,8 @@ def registrar_compra(pedido: PedidoCreate):
         "id_venta": id_venta,
         "total": pedido.total
     }
+
+@router.get("/modificadores/{id_producto}")
+def obtener_opciones(id_producto: int):
+    producto_model = Producto()
+    return producto_model.obtener_modificadores(id_producto)

@@ -36,6 +36,29 @@ class Producto(EntidadBD):
             cursor.execute(sql, (nombre_producto,))
             resultado = cursor.fetchone()
             return resultado[0] if resultado else None
+        
+    def obtener_modificadores(self, id_producto):
+        with self.db.cursor() as cursor:
+            sql = """
+                SELECT c.nombre_categoria, o.nombre_opcion, o.precio_adicional 
+                FROM Producto_Categoria pc
+                JOIN Categorias_Modificador c ON pc.id_categoria = c.id_categoria
+                JOIN Opciones_Modificador o ON c.id_categoria = o.id_categoria
+                WHERE pc.id_producto = %s
+            """
+            cursor.execute(sql, (id_producto,))
+            resultados = cursor.fetchall()
+            modificadores = {}
+            for row in resultados:
+                categoria = row['nombre_categoria']
+                opcion = row['nombre_opcion']
+                precio = float(row['precio_adicional'])
+                
+                if categoria not in modificadores:
+                    modificadores[categoria] = []
+                modificadores[categoria].append({"nombre": opcion, "precio": precio})
+            
+            return modificadores
 
 class Venta(EntidadBD):
     def __init__(self, id_metodo, total_pagado):
