@@ -59,7 +59,27 @@ class Producto(EntidadBD):
                 modificadores[categoria].append({"nombre": opcion, "precio": precio})
             
             return modificadores
-
+        
+    def obtener_id_y_precio_por_nombre(self, nombre):
+        with self.db.cursor() as cursor:
+            sql = "SELECT id_producto, precio_base FROM Productos_Base WHERE nombre = %s"
+            cursor.execute(sql, (nombre,))
+            row = cursor.fetchone()
+            
+            if row:
+                return row['id_producto'], float(row['precio_base'])
+            return None
+        
+    def obtener_precio_modificador(self, nombre_opcion):
+        with self.db.cursor() as cursor:
+            sql = "SELECT precio_adicional FROM Opciones_Modificador WHERE nombre_opcion = %s"
+            cursor.execute(sql, (nombre_opcion,))
+            row = cursor.fetchone()
+            
+            if row:
+                return float(row['precio_adicional'])
+            return 0.0
+        
 class Venta(EntidadBD):
     def __init__(self, id_metodo, total_pagado):
         super().__init__()
