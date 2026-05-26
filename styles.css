@@ -122,34 +122,26 @@ body {
     flex-direction: column;
 }
 
+/* NUEVOS ESTILOS PARA EL TICKET DINÁMICO (UL / LI) */
 #lista-ticket {
     flex-grow: 1;
     margin-top: 20px;
     border-bottom: 2px solid #eeeeee;
     padding-bottom: 10px;
+    list-style-type: none; 
 }
 
-.item-ticket {
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px dashed #dddddd;
+#lista-ticket li {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
 }
 
-.nombre-item {
-    font-weight: bold;
-}
-
-.detalle-item {
-    font-size: 0.85em;
-    color: #666666;
-    margin-left: 10px;
-}
-
-.precio-item {
-    text-align: right;
-    font-weight: bold;
-    color: var(--color-primario);
-    margin-top: 5px;
+#lista-ticket li b {
+    color: #d35400; /* Naranja para resaltar el nombre */
 }
 
 .total-caja {
@@ -162,14 +154,21 @@ body {
     margin-bottom: 20px;
 }
 
-#metodos-pago label {
-    display: block;
-    margin: 10px 0;
+/* Estilo para el nuevo select */
+#metodo-pago {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+    font-size: 15px;
+    margin-top: 10px;
     cursor: pointer;
 }
 
-#btn-generar-voucher {
-    background-color: #2e7d32; /* Verde para confirmar pago */
+/* BOTÓN VERDE CORREGIDO (cambiado a #btn-pagar) */
+#btn-pagar {
+    background-color: #2e7d32; 
     color: var(--color-blanco);
     border: none;
     padding: 15px;
@@ -180,7 +179,7 @@ body {
     width: 100%;
 }
 
-#btn-generar-voucher:hover {
+#btn-pagar:hover {
     background-color: #1b5e20;
 }
 
