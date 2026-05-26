@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from schemas.pydantic_models import PedidoCreate
 from models.entities import Producto, Venta, DetalleVenta
 
@@ -11,6 +11,9 @@ def obtener_carta():
 
 @router.post("/comprar")
 def registrar_compra(pedido: PedidoCreate):
+    if len(pedido.detalle_pedido) == 0 or pedido.total <= 0:
+        raise HTTPException(status_code=400, detail="Transacción rechazada: El ticket está vacío o el monto es inválido.")
+    
     # Mapeo de métodos de pago según la base de datos
     metodos_map = {"yape": 1, "plin": 2, "efectivo": 3}
     id_metodo = metodos_map.get(pedido.metodo_pago, 3)
